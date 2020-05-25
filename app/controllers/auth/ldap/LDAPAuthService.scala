@@ -65,14 +65,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
       case Some(groupConfig) => checkGroupMembership(username, groupConfig) && checkUserAuth(username, password)
       case None              => checkUserAuth(username, password)
     }
-    if (isValidUser) Some(username) 
-    {
-    log.info("login successful") 
-    }
-    else 
-    {
-    log.error("login failed")  
-    }
+    if (isValidUser) Some(username) else None
   }
 
 }
