@@ -67,11 +67,11 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
     }
     if (isValidUser) Some(username) 
     {
-    log.info(s"login successful") 
+    log.info("login successful") 
     }
     else 
     {
-    log.error(s"login failed")  
+    log.error("login failed")  
     }
   }
 
