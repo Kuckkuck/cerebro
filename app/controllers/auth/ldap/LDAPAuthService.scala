@@ -33,6 +33,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
         log.error(s"login of $username failed", e)
         false
     }
+    log.info(s"checkUserAuth")
   }
 
   def checkGroupMembership(username: String, groupConfig: LDAPGroupSearchConfig): Boolean = {
@@ -56,6 +57,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
         log.error(s"Unexpected error while checking group membership of $username", e)
         false
     }
+    log.info(s"checkGroupMembership")
   }
 
   def auth(username: String, password: String): Option[String] = {
@@ -63,7 +65,11 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
       case Some(groupConfig) => checkGroupMembership(username, groupConfig) && checkUserAuth(username, password)
       case None              => checkUserAuth(username, password)
     }
-    if (isValidUser) Some(username) else None
+    if (isValidUser) Some(username) 
+     log.info("login of $username successful") 
+    else {
+    log.error("login of $username failed")  
+    } 
   }
 
 }
