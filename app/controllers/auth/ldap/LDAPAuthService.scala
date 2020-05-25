@@ -50,6 +50,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
       val context = LdapCtxFactory.getLdapCtxInstance(config.url, props)
       val search = context.search(groupConfig.baseDN,s"(& (${groupConfig.userAttr}=$user)(${groupConfig.group}))", controls)
       context.close()
+      log.info(s"checkGroupMembership: $search") 
       search.hasMore()
     } catch {
       case e: AuthenticationException =>
@@ -66,7 +67,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
       case Some(groupConfig) => checkGroupMembership(username, groupConfig) && checkUserAuth(username, password)
       case None              => checkUserAuth(username, password)
     }
-    log.info(s"auth")
+    log.info(s"auth: $isValidUser")
     if (isValidUser) Some(username) else None
   }
 
