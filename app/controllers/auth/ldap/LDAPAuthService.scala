@@ -19,11 +19,12 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
 
   def checkUserAuth(username: String, password: String): Boolean = {
     val props = new Hashtable[String, String]()
+    log.info(s"checkUserAuth")
     props.put(Context.SECURITY_PRINCIPAL, config.userTemplate.format(username, config.baseDN))
     props.put(Context.SECURITY_CREDENTIALS, password)
 
     try {
-      log.info(s"checkUserAuth")
+      log.info(s"try checkUserAuth")
       LdapCtxFactory.getLdapCtxInstance(config.url, props)
       true
     } catch {
@@ -45,7 +46,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
     val controls = new SearchControls()
     controls.setSearchScope(SearchControls.SUBTREE_SCOPE)
     try {
-      log.info(s"checkGroupMembership")
+      log.info(s"try checkGroupMembership")
       val context = LdapCtxFactory.getLdapCtxInstance(config.url, props)
       val search = context.search(groupConfig.baseDN,s"(& (${groupConfig.userAttr}=$user)(${groupConfig.group}))", controls)
       context.close()
@@ -65,6 +66,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
       case Some(groupConfig) => checkGroupMembership(username, groupConfig) && checkUserAuth(username, password)
       case None              => checkUserAuth(username, password)
     }
+    log.info(s"auth")
     if (isValidUser) Some(username) else None
   }
 
