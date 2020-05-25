@@ -23,6 +23,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
     props.put(Context.SECURITY_CREDENTIALS, password)
 
     try {
+      log.info(s"checkUserAuth")
       LdapCtxFactory.getLdapCtxInstance(config.url, props)
       true
     } catch {
@@ -33,7 +34,6 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
         log.error(s"login of $username failed", e)
         false
     }
-    log.info(s"checkUserAuth")
   }
 
   def checkGroupMembership(username: String, groupConfig: LDAPGroupSearchConfig): Boolean = {
@@ -45,6 +45,7 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
     val controls = new SearchControls()
     controls.setSearchScope(SearchControls.SUBTREE_SCOPE)
     try {
+      log.info(s"checkGroupMembership")
       val context = LdapCtxFactory.getLdapCtxInstance(config.url, props)
       val search = context.search(groupConfig.baseDN,s"(& (${groupConfig.userAttr}=$user)(${groupConfig.group}))", controls)
       context.close()
@@ -57,7 +58,6 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
         log.error(s"Unexpected error while checking group membership of $username", e)
         false
     }
-    log.info(s"checkGroupMembership")
   }
 
   def auth(username: String, password: String): Option[String] = {
@@ -67,11 +67,11 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
     }
     if (isValidUser) Some(username) 
     {
-    log.info("login of $username successful") 
+    log.info(s"login of $username successful") 
     }
     else 
     {
-    log.error("login of $username failed")  
+    log.error(s"login of $username failed")  
     }
   }
 
