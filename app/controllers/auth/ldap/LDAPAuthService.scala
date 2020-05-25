@@ -65,8 +65,6 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
   def auth(username: String, password: String): Option[String] = {
     log.info(s"auth")
     log.info(s"checkGoupMembership LDAPGroupSearchConfig: $LDAPGroupSearchConfig")
-    log.info(s"checkGoupMembership groupAuthConfig: $groupAuthConfig")
-    log.info(s"checkGoupMembership groupMembership: $groupMembership")
     val isValidUser = config.groupMembership match {
       case Some(groupConfig) => checkGroupMembership(username, groupConfig) && checkUserAuth(username, password)
       case None              => checkUserAuth(username, password)
