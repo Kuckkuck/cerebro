@@ -6,10 +6,15 @@ import com.google.inject.Inject
 import com.sun.jndi.ldap.LdapCtxFactory
 import controllers.auth.AuthService
 import javax.naming._
-import javax.naming.directory.SearchControls
 import play.api.{Configuration, Logger}
 
 import scala.util.control.NonFatal
+
+import scala.collection.JavaConversions.enumerationAsScalaIterator
+import com.sun.jndi.ldap.LdapCtxFactory
+import javax.naming.directory.SearchControls.SUBTREE_SCOPE
+import javax.naming.directory.SearchControls
+import javax.naming.{AuthenticationException, Context}
 
 class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService {
 
