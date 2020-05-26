@@ -46,19 +46,27 @@ class LDAPAuthService @Inject()(globalConfig: Configuration) extends AuthService
     val controls = new SearchControls()
     controls.setSearchScope(SearchControls.SUBTREE_SCOPE)
     try {
-      log.info(s"try checkGroupMembership")
       val context = LdapCtxFactory.getLdapCtxInstance(config.url, props)
-      val search = context.search(groupConfig.baseDN,s"(& (${groupConfig.userAttr}=$user)(${groupConfig.group}))", controls)
+      val renum = context.search(groupConfig.baseDN, "(& ("+groupConfig.userAttr+"="+username+"))", controls)
       context.close()
-      log.info(s"checkGroupMembership: $search") 
-      search.hasMore()
+      val check: Boolean = if (!renum.hasMore()) {
+        log.info(s"Cannot locate user information for $username")
+        false
+      } else {
+        val groups = renum.flatMap(f => {
+          val memberof = f.getAttributes().get("memberof").getAll
+          val groups = memberof.map(f => {
+
+            f.toString()
+
+          })
+          groups
+        })
+        groups.contains(groupConfig.group)
+      }
+      check
     } catch {
-      case e: AuthenticationException =>
-        log.info(s"User $username doesn't fulfill condition (${groupConfig.group}) : ${e.getMessage}")
-        false
-      case NonFatal(e) =>
-        log.error(s"Unexpected error while checking group membership of $username", e)
-        false
+      case authError:AuthenticationException => log.error(s"Authentication failed: $authError"); false
     }
   }
 
